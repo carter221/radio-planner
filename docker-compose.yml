@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+    container_name: django_radio
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - ./media:/usr/src/app/media
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard-radio.rule=Host(`dashboard-radio.eglisecdau.com`)"
+      - "traefik.http.routers.dashboard-radio.entrypoints=ht      tps"
+      - "traefik.http.routers.dashboard-radio.tls.certresolver=myresolver" 
+      - "traefik.http.services.dashboard-radio.loadbalancer.server.port=3000"
+    environment:
+      - DJANGO_DB_NAME=radio_dashboard
+      - DJANGO_DB_USER=radio_admin
+      - DJANGO_DB_PASSWORD=Church2024
+      - DJANGO_DB_HOST=db
+    depends_on:
+      - db
+    networks:
+      - web
+    restart: always
+
+  db:
+    image: postgres:15
+    container_name: radio_postgres
+    environment:
+      POSTGRES_USER: radio_admin
+      POSTGRES_PASSWORD: Church2024
+      POSTGRES_DB: radio_dashboard
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - web
+
+volumes:
+  db_data:
+
+networks:
+  web:
+    external: true
