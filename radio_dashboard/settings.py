@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'scheduler',
-    'custom_tasks',
+    'cron_manager',
 ]
 
 MIDDLEWARE = [
