@@ -40,7 +40,7 @@ def generate_liquidsoap_config():
     base_path = '/home/mediauser/songs/'  # Chemin des chansons
 
     # Configuration par défaut (aucun programme actif)
-    config = '''
+    default_config = '''
     # Charger la chanson et la faire tourner en boucle manuellement
     backup = fallback([single("/home/mediauser/songs/song.mp3"), fallback([])])
 
@@ -61,7 +61,6 @@ def generate_liquidsoap_config():
     )
     '''
 
-    # Si un programme actif existe, créez la configuration appropriée
     if current_schedule and current_schedule.song.file_path:
         song_file_name = os.path.basename(current_schedule.song.file_path.name)
         absolute_song_path = os.path.join(base_path, song_file_name)
@@ -88,7 +87,8 @@ def generate_liquidsoap_config():
         '''
         program_identifier = absolute_song_path
     else:
-        # Si aucun programme actif, utilisez une chaîne fixe
+        # Si aucun programme actif, utilisez la configuration par défaut
+        config = default_config
         program_identifier = "default"
 
     # Générer un hash unique pour le programme actuel
