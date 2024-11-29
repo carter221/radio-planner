@@ -1,5 +1,7 @@
 # scheduler/models.py
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 class Song(models.Model):
     title = models.CharField(max_length=255, verbose_name="Titre de la chanson")
@@ -32,6 +34,17 @@ class Schedule(models.Model):
         start = datetime.combine(self.scheduled_date, self.start_time)
         end = datetime.combine(self.scheduled_date, self.end_time)
         return (end - start).total_seconds() / 60  # Durée en minutes
+
+    def clean(self):
+        super().clean()
+        overlapping_schedules = Schedule.objects.filter(
+            scheduled_date=self.scheduled_date,
+            start_time__lt=self.end_time,
+            end_time__gt=self.start_time
+        ).exclude(id=self.id)
+
+        if overlapping_schedules.exists():
+            raise ValidationError(_('Le programme chevauche un autre programme existant.'))
 
 
     def __str__(self):
