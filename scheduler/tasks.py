@@ -1,4 +1,4 @@
-from django.utils.timezone import localtime
+from django.utils.timezone import localtime, now
 from scheduler.models import Schedule
 import os
 import hashlib
@@ -30,10 +30,12 @@ def generate_liquidsoap_config():
     """
     Génère le fichier de configuration Liquidsoap uniquement si le programme actif change.
     """
-    now = localtime().time()
+    current_time = localtime().time()
+    current_date = localtime().date()
     current_schedule = Schedule.objects.filter(
-        start_time__lte=now,
-        end_time__gt=now
+        scheduled_date=current_date,
+        start_time__lte=current_time,
+        end_time__gt=current_time
     ).first()
 
     liquidsoap_path = '/usr/src/app/media/radio.liq'  # Fichier Liquidsoap
