@@ -1,20 +1,28 @@
+# Fichier de playlist temporaire
+playlist_file = "/home/mediauser/playlist.liq"
 
-    # Charger la chanson et la faire tourner en boucle manuellement
-    backup = fallback([single("/home/mediauser/songs/song.mp3"), fallback([])])
+# Fonction pour charger la playlist dynamiquement
+def load_playlist()
+  # Lire le contenu du fichier de playlist
+  content = process.read.lines("cat " ^ playlist_file)
+  if list.length(content) > 0 then
+    # Retourner une liste de requêtes basées sur le contenu du fichier
+    [request.create(list.hd(content))]
+  else
+    log("La playlist est vide ou inaccessible.")
+    []
+  end
+end
 
-    # Configurer la source en direct depuis Icecast
-    live = mksafe(fallback(track_sensitive = false, [input.http("http://radio.eglisecdau.com:8000/live"), backup]))
+# Source dynamique pour recharger la playlist
+dynamic_playlist = mksafe(request.dynamic.list(load_playlist))
 
-    # Créer un fallback entre la source live et le backup
-    radio = fallback(track_sensitive=false, [live, backup])
-
-    # Configurer la sortie vers Icecast
-    output.icecast(
-    %mp3,
-    host="radio.eglisecdau.com",
-    port=8000,
-    password="601Blaise@",
-    mount="/stream",
-    radio
-    )
-    
+# Configurer la sortie vers Icecast
+output.icecast(
+  %mp3,
+  host="radio.eglisecdau.com",
+  port=8000,
+  password="601Blaise@",
+  mount="/stream",
+  dynamic_playlist
+)

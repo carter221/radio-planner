@@ -2,6 +2,7 @@ from django.utils.timezone import localtime, now
 from scheduler.models import Schedule
 import os
 import hashlib
+import subprocess
 
 
 # Chemin du fichier temporaire pour garder une trace de l'état
@@ -38,7 +39,7 @@ def generate_liquidsoap_config():
         end_time__gt=current_time
     ).first()
 
-    liquidsoap_path = '/usr/src/app/media/radio.liq'  # Fichier Liquidsoap
+    playlist_path = '/home/mediauser/playlist.liq'  # Fichier de playlist temporaire
     base_path = '/home/mediauser/songs/'  # Chemin des chansons
 
     # Configuration par défaut (aucun programme actif)
@@ -51,16 +52,6 @@ def generate_liquidsoap_config():
 
     # Créer un fallback entre la source live et le backup
     radio = fallback(track_sensitive=false, [live, backup])
-
-    # Configurer la sortie vers Icecast
-    output.icecast(
-    %mp3,
-    host="radio.eglisecdau.com",
-    port=8000,
-    password="601Blaise@",
-    mount="/stream",
-    radio
-    )
     '''
 
     if current_schedule and current_schedule.song.file_path:
@@ -76,16 +67,6 @@ def generate_liquidsoap_config():
 
         # Créer un fallback entre la source live et le backup
         radio = fallback(track_sensitive=false, [live, backup])
-
-        # Configurer la sortie vers Icecast
-        output.icecast(
-        %mp3,
-        host="radio.eglisecdau.com",
-        port=8000,
-        password="601Blaise@",
-        mount="/stream",
-        radio
-        )
         '''
         program_identifier = absolute_song_path
     else:
@@ -101,14 +82,14 @@ def generate_liquidsoap_config():
 
     # Si le programme n'a pas changé, ne rien faire
     if last_program_hash == current_program_hash:
-        print("Le programme n'a pas changé. Aucun changement dans le fichier radio.liq.")
+        print("Le programme n'a pas changé. Aucun changement dans le fichier playlist.liq.")
         return
 
     # Si le programme a changé, mettre à jour le fichier et sauvegarder l'état
     try:
-        with open(liquidsoap_path, 'w') as f:
+        with open(playlist_path, 'w') as f:
             f.write(config)
         save_program_state(current_program_hash)
-        print(f"Fichier {liquidsoap_path} mis à jour avec succès.")
+        print(f"Fichier {playlist_path} mis à jour avec succès.")
     except Exception as e:
-        print(f"Erreur lors de la mise à jour de {liquidsoap_path} : {e}")
+        print(f"Erreur lors de la mise à jour de {playlist_path} : {e}")

@@ -20,15 +20,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Créer un dossier pour les fichiers médias
 VOLUME /usr/src/app/media
 
-# Ajouter le fichier cron
-COPY django-cron /etc/cron.d/django-cron
-
-# Donner les permissions correctes au fichier cron
-RUN chmod 0644 /etc/cron.d/django-cron
-
-# Installer la crontab
-RUN crontab /etc/cron.d/django-cron
-
 # Créer un fichier de log pour cron
 RUN touch /var/log/cron.log
 
