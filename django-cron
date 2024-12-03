@@ -1,2 +1,2 @@
-*/3 * * * * /usr/local/bin/python3 /usr/src/app/manage.py my_task >> /var/log/cron.log 2>&1
+*/1 * * * * /usr/local/bin/python3 /usr/src/app/manage.py my_task >> /var/log/cron.log 2>&1
 # <--- Assurez-vous qu'il y a une ligne vide ici.
