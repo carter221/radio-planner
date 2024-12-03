@@ -13,7 +13,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard-radio.rule=Host(`dashboard-radio.eglisecdau.com`)"
-      - "traefik.http.routers.dashboard-radio.entrypoints=ht      tps"
+      - "traefik.http.routers.dashboard-radio.entrypoints=https"
       - "traefik.http.routers.dashboard-radio.tls.certresolver=myresolver" 
       - "traefik.http.services.dashboard-radio.loadbalancer.server.port=3000"
     environment:
